@@ -1,0 +1,24 @@
+# Dependencies 
+vendor/
+
+# Binaries for programs and plugins
+main
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+
+# Config
+.env
+
+# Logs
+*.log
+
+.vscode/
