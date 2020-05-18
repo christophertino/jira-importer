@@ -12,9 +12,9 @@ This project will:
 
 + Set issues to their correct type
 + Add story points
-+ Add sub-tasks to their correct parent tasks
 + Set Epics as Story type and create "Relates" issue type relationship with former children
 	+ Currently there is not way to convert a Task to Epic
++ Add sub-tasks to their correct parent tasks
 + Add components as ticket labels (Next-gen does not support components)
 
 ## Configuration

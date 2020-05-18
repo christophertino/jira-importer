@@ -47,6 +47,8 @@ func main() {
 
 	// Build the JiraImporter config
 	ji := jiraimporter.JiraImporter{
+		JiraEmail:  os.Getenv(("jira_email")),
+		JiraToken:  os.Getenv(("jira_token")),
 		CSVPath:    csvPath,
 		JiraClient: jiraClient,
 	}
