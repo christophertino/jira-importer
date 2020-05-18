@@ -1,9 +1,7 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
-	"log"
 	"os"
 
 	"github.com/andygrunwald/go-jira"
@@ -19,7 +17,8 @@ var (
 func init() {
 	// Load local env file
 	if err = godotenv.Load(); err != nil {
-		log.Fatalf("Error loading .env file: %s", err)
+		fmt.Println("Error loading .env file:", err)
+		os.Exit(1)
 	}
 
 	// Create Jira client
@@ -37,17 +36,14 @@ func init() {
 }
 
 func main() {
-	reader := bufio.NewReader(os.Stdin)
-
 	fmt.Println("--- Jira Next-Gen Importer ---")
-	fmt.Println("Enter path to Jira issue export CSV:")
-	fmt.Print("-> ")
 
-	csvPath, err := reader.ReadString('\n')
-	if err != nil {
-		fmt.Println("Error reading CSV path:", err)
+	if len(os.Args) <= 1 {
+		fmt.Println("Please enter path to Jira export CSV")
 		os.Exit(1)
 	}
+
+	csvPath := os.Args[1]
 
 	// Build the JiraImporter config
 	ji := jiraimporter.JiraImporter{

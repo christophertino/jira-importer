@@ -54,5 +54,5 @@ $ cp .env-example .env
 ## Run the Import Helper
 
 ```sh
-$ go run cmd/importer/main.go
+$ go run cmd/importer/main.go ./path-to-csv
 ```
