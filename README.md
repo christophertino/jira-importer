@@ -6,6 +6,7 @@ A set of helper tools for importing issues from a classic Jira project into a ne
 + Story points are removed
 + Epics lose their children
 + Sub-tasks lose their parent relationships
++ Split issue relationships are lost
 + Component info is lost
 
 This project will:
