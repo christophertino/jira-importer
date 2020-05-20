@@ -27,7 +27,7 @@ func init() {
 			Username: os.Getenv(("jira_email")),
 			Password: os.Getenv(("jira_token")),
 		}
-		jiraClient, err = jira.NewClient(jiraAuth.Client(), "https://ghostery.atlassian.net/")
+		jiraClient, err = jira.NewClient(jiraAuth.Client(), os.Getenv("jira_domain"))
 		if err != nil {
 			fmt.Println("Error creating Jira client:", err)
 			os.Exit(1)
@@ -36,7 +36,7 @@ func init() {
 }
 
 func main() {
-	fmt.Println("--- Jira Next-Gen Importer ---")
+	fmt.Println("--- Jira Next-Gen Issue Importer ---")
 
 	if len(os.Args) <= 1 {
 		fmt.Println("Please enter path to Jira export CSV")
@@ -49,6 +49,7 @@ func main() {
 	ji := jiraimporter.JiraImporter{
 		JiraEmail:  os.Getenv(("jira_email")),
 		JiraToken:  os.Getenv(("jira_token")),
+		JiraDomain: os.Getenv("jira_domain"),
 		CSVPath:    csvPath,
 		JiraClient: jiraClient,
 	}

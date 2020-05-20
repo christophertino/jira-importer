@@ -9,10 +9,10 @@ import (
 
 // Issue is a row from the Jira import file
 type Issue struct {
-	IssueID     string `csv:"Issue id"`
-	IssueKey    string `csv:"Issue key"`
+	IssueID     string `csv:"Issue id"`  // JiraID
+	IssueKey    string `csv:"Issue key"` // Public ID (i.e. GL-27)
 	IssueType   string `csv:"Issue Type"`
-	ParentID    string `csv:"Parent id"`
+	ParentID    string `csv:"Parent id"` // JiraID
 	ProjectKey  string `csv:"Project key"`
 	Labels      string `csv:"Labels"`
 	EpicLink    string `csv:"Custom field (Epic Link)"`
@@ -24,18 +24,21 @@ type Issue struct {
 type issueUpdateData struct {
 	Update struct {
 		StoryPoints []struct {
-			Set string `json:"set,omitempty"`
+			Set int `json:"set,omitempty"`
 		} `json:"customfield_10016,omitempty"`
 	} `json:"update,omitempty"`
 	Fields struct {
-		Issuetype struct {
+		IssueType struct {
 			ID string `json:"id,omitempty"`
 		} `json:"issuetype,omitempty"`
+		Parent struct {
+			Key string `json:"key,omitempty"`
+		} `json:"parent,omitempty"`
 	} `json:"fields,omitempty"`
 }
 
-// Update a Jira issue by ID. Using `NewRequest` to allow `notifyUsers` param
-func (ji *JiraImporter) updateIssue(issueID string, data *issueUpdateData) error {
+// Update a Jira issue IssueKey. Using `NewRequest` to allow `notifyUsers` param
+func (ji *JiraImporter) updateIssue(issueKey string, data *issueUpdateData) error {
 	bytesMessage, err := json.Marshal(data)
 	if err != nil {
 		return err
@@ -43,10 +46,22 @@ func (ji *JiraImporter) updateIssue(issueID string, data *issueUpdateData) error
 
 	// fmt.Println(string(bytesMessage))
 
-	_, err = ji.JiraClient.NewRequest(http.MethodPut, fmt.Sprintf("/rest/api/3/issue/%s?notifyUsers=false", issueID), bytes.NewBuffer(bytesMessage))
+	_, err = ji.sendJiraRequest(http.MethodPut, fmt.Sprintf("/issue/%s?notifyUsers=false", issueKey), bytes.NewBuffer(bytesMessage))
 	if err != nil {
 		return err
 	}
 
+	fmt.Printf("Successfully updated issue %s\n", issueKey)
+
 	return nil
+}
+
+// Find parent IssueKey by its JiraID
+func findParentIssueKey(parentID string, issues []*Issue) string {
+	for _, issue := range issues {
+		if issue.IssueID == parentID {
+			return issue.IssueKey
+		}
+	}
+	return ""
 }

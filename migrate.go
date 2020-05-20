@@ -2,6 +2,7 @@ package jiraimporter
 
 import (
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/andygrunwald/go-jira"
@@ -32,58 +33,69 @@ func (ji *JiraImporter) MigrateIssues() {
 	for _, issue := range issues {
 		<-throttle
 		updateData := issueUpdateData{}
-		issuetype := issue.IssueType
+		issueType := issue.IssueType
 
 		switch issue.IssueType {
 		case "Epic":
 			// We can't convert existing types to Epics, so they become Stories instead
-			issuetype = "Story"
+			issueType = "Story"
 			break
 		case "Sub-task":
 			// Next-gen removes hyphen in Sub-task
-			issuetype = "Subtask"
+			issueType = "Subtask"
 			break
 		}
 
-		// If this was previously the a child of an Epic, make it a Subtask
-		// so we can make it a child of the new Story type
+		// Was this previously the a child of an Epic?
 		if issue.EpicLink != "" {
-			issuetype = "Subtask"
+			if issueType == "Subtask" {
+				// For subtasks, add the issue as the child of the new Story(epic)
+				updateData.Fields.Parent.Key = issue.EpicLink
+			} else {
+				// Only subtasks can be children. Create a 'Blocks' relationship
+				issueLink := jira.IssueLink{
+					Type: jira.IssueLinkType{
+						Name: "Blocks",
+					},
+					InwardIssue: &jira.Issue{
+						Key: issue.IssueKey,
+					},
+					OutwardIssue: &jira.Issue{
+						Key: issue.EpicLink,
+					},
+				}
+				_, err := ji.JiraClient.Issue.AddLink(&issueLink)
+				if err != nil {
+					fmt.Printf("Could not add 'Blocks' relationship to %s\n: %s", issue.IssueKey, err)
+				}
+			}
 		}
 
 		// Get the IssueType ID by name
-		typeID, err := getIssueTypeID(issuetype, project)
+		typeID, err := getIssueTypeID(issueType, project)
 		if err != nil {
 			fmt.Printf("Error getting type for issue %s: %s\n", issue.IssueKey, err)
 			continue
 		}
-		updateData.Fields.Issuetype.ID = typeID
+		updateData.Fields.IssueType.ID = typeID
+
+		// Add existing subtasks back to their parent issues
+		if issue.ParentID != "" {
+			if parentKey := findParentIssueKey(issue.ParentID, issues); parentKey != "" {
+				updateData.Fields.Parent.Key = parentKey
+			}
+		}
 
 		// Import story points
 		if issue.StoryPoints != "" {
-			updateData.Update.StoryPoints[0].Set = issue.StoryPoints
-		}
-
-		// Update the issue on Jira
-		if err = ji.updateIssue(issue.IssueKey, &updateData); err != nil {
-			fmt.Printf("Error updating issue %s: %s\n", issue.IssueKey, err)
-			continue
-		}
-	}
-
-	// Now that Issue types are correct, we can set relationships
-	for _, issue := range issues {
-		<-throttle
-		updateData := issueUpdateData{}
-
-		// Add children back to Epics
-		if issue.EpicLink != "" {
-
-		}
-
-		// Add subtasks back to their parent issues
-		if issue.ParentID != "" {
-
+			points, err := strconv.Atoi(issue.StoryPoints)
+			if err == nil {
+				updateData.Update.StoryPoints = append(updateData.Update.StoryPoints, struct {
+					Set int `json:"set,omitempty"`
+				}{
+					Set: points,
+				})
+			}
 		}
 
 		// Fix missing Issue Split relationships
@@ -105,11 +117,11 @@ func (ji *JiraImporter) MigrateIssues() {
 			}
 		}
 
+		// Update the issue on Jira
+		if err = ji.updateIssue(issue.IssueKey, &updateData); err != nil {
+			fmt.Printf("Error updating issue %s: %s\n", issue.IssueKey, err)
+		}
 	}
 
-	// Epics become stories and subtasks are relationships
-
-	// Handle subtasks by adding them to correct parents
-
-	// Components become labels
+	// TODO: Components become labels
 }
