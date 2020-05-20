@@ -37,7 +37,7 @@ type issueUpdateData struct {
 	} `json:"fields,omitempty"`
 }
 
-// Update a Jira issue IssueKey. Using `NewRequest` to allow `notifyUsers` param
+// Update a Jira issue IssueKey
 func (ji *JiraImporter) updateIssue(issueKey string, data *issueUpdateData) error {
 	bytesMessage, err := json.Marshal(data)
 	if err != nil {

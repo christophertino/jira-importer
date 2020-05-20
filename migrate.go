@@ -125,3 +125,43 @@ func (ji *JiraImporter) MigrateIssues() {
 
 	// TODO: Components become labels
 }
+
+// MigrateVersions migrates project FixVersions between Jira accounts
+func (ji *JiraImporter) MigrateVersions() {
+	// Load the CSV export
+	issues, err := parseCSV(ji.CSVPath)
+	if err != nil {
+		fmt.Println("Error parsing CSV file:", err)
+		return
+	}
+
+	// Get Project info
+	project, _, err := ji.JiraClient.Project.Get(issues[0].ProjectKey)
+	if err != nil {
+		fmt.Println("Error getting Project info:", err)
+		return
+	}
+
+	// Query project info from the legacy account
+	legacyVersions, err := ji.getLegacyProjectVersions(project.Key)
+	if err != nil {
+		fmt.Println("Error getting legacy project versions:", err)
+		return
+	}
+
+	// Look at all versions currently on the new Jira account
+	for _, v := range project.Versions {
+		// Lookup version info on the old account
+		if legacyVersion := getVersionInfo(v.Name, legacyVersions); legacyVersion != nil {
+			updatedVersion := &jira.FixVersion{
+				Released:    legacyVersion.Released,
+				ReleaseDate: legacyVersion.ReleaseDate,
+			}
+			// Update version on the new account
+			if err := ji.updateVersion(v.ID, updatedVersion); err != nil {
+				fmt.Println("Error updating version:", err)
+				return
+			}
+		}
+	}
+}

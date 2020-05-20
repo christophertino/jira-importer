@@ -13,11 +13,14 @@ import (
 
 // JiraImporter creates a struct of config info
 type JiraImporter struct {
-	JiraEmail  string
-	JiraToken  string
-	JiraDomain string
-	CSVPath    string
-	JiraClient *jira.Client
+	JiraEmail    string
+	JiraToken    string
+	JiraDomain   string
+	LegacyEmail  string
+	LegacyToken  string
+	LegacyDomain string
+	CSVPath      string
+	JiraClient   *jira.Client
 }
 
 // Custom error type for Jira API requests

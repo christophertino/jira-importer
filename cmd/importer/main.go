@@ -47,12 +47,16 @@ func main() {
 
 	// Build the JiraImporter config
 	ji := jiraimporter.JiraImporter{
-		JiraEmail:  os.Getenv(("jira_email")),
-		JiraToken:  os.Getenv(("jira_token")),
-		JiraDomain: os.Getenv("jira_domain"),
-		CSVPath:    csvPath,
-		JiraClient: jiraClient,
+		JiraEmail:    os.Getenv(("jira_email")),
+		JiraToken:    os.Getenv(("jira_token")),
+		JiraDomain:   os.Getenv("jira_domain"),
+		LegacyEmail:  os.Getenv(("legacy_email")),
+		LegacyToken:  os.Getenv(("legacy_token")),
+		LegacyDomain: os.Getenv("legacy_domain"),
+		CSVPath:      csvPath,
+		JiraClient:   jiraClient,
 	}
 
 	ji.MigrateIssues()
+	ji.MigrateVersions()
 }
