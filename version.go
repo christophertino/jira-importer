@@ -39,7 +39,7 @@ func (ji *JiraImporter) updateVersion(versionID string, data *jira.FixVersion) e
 	return nil
 }
 
-// Make a request to the previous JIRA cloud API
+// Fetch all project versions from the previous Jira instance
 func (ji *JiraImporter) getLegacyProjectVersions(projectKey string) ([]*jira.FixVersion, error) {
 	req, err := http.NewRequest(http.MethodGet, fmt.Sprintf("%s/rest/api/3/project/%s/versions", ji.LegacyDomain, projectKey), nil)
 	if err != nil {

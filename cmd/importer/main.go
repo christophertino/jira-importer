@@ -59,4 +59,5 @@ func main() {
 
 	ji.MigrateIssues()
 	ji.MigrateVersions()
+	ji.MigrateComponents()
 }

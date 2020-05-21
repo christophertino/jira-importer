@@ -165,3 +165,50 @@ func (ji *JiraImporter) MigrateVersions() {
 		}
 	}
 }
+
+// MigrateComponents migrates Components to Labels on a next-gen project
+func (ji *JiraImporter) MigrateComponents() {
+	// Load the CSV export
+	issues, err := parseCSV(ji.CSVPath)
+	if err != nil {
+		fmt.Println("Error parsing CSV file:", err)
+		return
+	}
+
+	// Get Project info
+	project, _, err := ji.JiraClient.Project.Get(issues[0].ProjectKey)
+	if err != nil {
+		fmt.Println("Error getting Project info:", err)
+		return
+	}
+
+	// Query project info from the legacy account
+	legacyComponents, err := ji.getLegacyProjectComponents(project.Key)
+	if err != nil {
+		fmt.Println("Error getting legacy project components:", err)
+		return
+	}
+
+	// Look at all versions currently on the new Jira account
+	for _, c := range legacyComponents {
+		// Search old jira account for any issues attached to the component
+		issues, err := ji.getLegacyComponentIssues(project.Key, c.Name)
+		if err != nil {
+			fmt.Printf("Error getting Component %s info: %s\n", c.Name, err)
+			continue
+		}
+
+		// Add label to issues on new account
+		for _, i := range issues {
+			var updateData = issueUpdateData{}
+			updateData.Update.Labels = append(updateData.Update.Labels, struct {
+				Add string `json:"add,omitempty"`
+			}{
+				Add: c.Name,
+			})
+			if err = ji.updateIssue(i.Key, &updateData); err != nil {
+				fmt.Printf("Error updating issue %s: %s\n", i.Key, err)
+			}
+		}
+	}
+}

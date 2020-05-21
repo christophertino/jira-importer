@@ -26,6 +26,9 @@ type issueUpdateData struct {
 		StoryPoints []struct {
 			Set int `json:"set,omitempty"`
 		} `json:"customfield_10016,omitempty"`
+		Labels []struct {
+			Add string `json:"add,omitempty"`
+		} `json:"labels,omitempty"`
 	} `json:"update,omitempty"`
 	Fields struct {
 		IssueType struct {
