@@ -22,32 +22,36 @@ type Issue struct {
 
 // Creates the PUT body data used to update Jira issues
 type issueUpdateData struct {
-	Update struct {
-		StoryPoints []struct {
-			Set int `json:"set,omitempty"`
-		} `json:"customfield_10016,omitempty"`
-		Labels []struct {
-			Add string `json:"add,omitempty"`
-		} `json:"labels,omitempty"`
-	} `json:"update,omitempty"`
-	Fields struct {
-		IssueType struct {
-			ID string `json:"id,omitempty"`
-		} `json:"issuetype,omitempty"`
-		Parent struct {
-			Key string `json:"key,omitempty"`
-		} `json:"parent,omitempty"`
-	} `json:"fields,omitempty"`
+	Update *updateData `json:"update,omitempty"`
+	Fields *fieldsData `json:"fields,omitempty"`
 }
 
-// Update a Jira issue IssueKey
+type updateData struct {
+	StoryPoints []struct {
+		Set int `json:"set,omitempty"`
+	} `json:"customfield_10016,omitempty"`
+	Labels []struct {
+		Add string `json:"add,omitempty"`
+	} `json:"labels,omitempty"`
+}
+
+type fieldsData struct {
+	IssueType struct {
+		ID string `json:"id,omitempty"`
+	} `json:"issuetype,omitempty"`
+	Parent struct {
+		Key string `json:"key,omitempty"`
+	} `json:"parent,omitempty"`
+}
+
+// Update a Jira issue by IssueKey
 func (ji *JiraImporter) updateIssue(issueKey string, data *issueUpdateData) error {
 	bytesMessage, err := json.Marshal(data)
 	if err != nil {
 		return err
 	}
 
-	// fmt.Println(string(bytesMessage))
+	fmt.Println(string(bytesMessage))
 
 	_, err = ji.sendJiraRequest(http.MethodPut, fmt.Sprintf("/issue/%s?notifyUsers=false", issueKey), bytes.NewBuffer(bytesMessage))
 	if err != nil {

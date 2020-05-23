@@ -10,6 +10,15 @@ import (
 	"github.com/andygrunwald/go-jira"
 )
 
+// Jira search response
+type searchResults struct {
+	StartAt    int           `json:"startAt"`
+	MaxResults int           `json:"maxResults"`
+	Total      int           `json:"total"`
+	Issues     []*jira.Issue `json:"issues"`
+}
+
+// JQL search query format
 type jqlBody struct {
 	Jql        string `json:"jql"`
 	MaxResults int    `json:"maxResults"`
@@ -66,7 +75,8 @@ func (ji *JiraImporter) getLegacyComponentIssues(projectKey string, componentNam
 		return nil, err
 	}
 
-	req, err := http.NewRequest(http.MethodPost, "/search", bytes.NewBuffer(bytesMessage))
+	// Note: Using API v3 here breaks the jira.Issue.Fields formating for unmarshal
+	req, err := http.NewRequest(http.MethodPost, fmt.Sprintf("%s/rest/api/2/search", ji.LegacyDomain), bytes.NewBuffer(bytesMessage))
 	if err != nil {
 		return nil, err
 	}
@@ -94,10 +104,10 @@ func (ji *JiraImporter) getLegacyComponentIssues(projectKey string, componentNam
 		return nil, jError
 	}
 
-	issues := []*jira.Issue{}
-	if err := json.Unmarshal(bodyBytes, &issues); err != nil {
+	results := searchResults{}
+	if err := json.Unmarshal(bodyBytes, &results); err != nil {
 		return nil, err
 	}
 
-	return issues, nil
+	return results.Issues, nil
 }

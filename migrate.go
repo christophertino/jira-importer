@@ -3,6 +3,7 @@ package jiraimporter
 import (
 	"fmt"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/andygrunwald/go-jira"
@@ -32,7 +33,8 @@ func (ji *JiraImporter) MigrateIssues() {
 	// Convert issues to correct types
 	for _, issue := range issues {
 		<-throttle
-		updateData := issueUpdateData{}
+		ud := &updateData{}
+		fd := &fieldsData{}
 		issueType := issue.IssueType
 
 		switch issue.IssueType {
@@ -50,7 +52,7 @@ func (ji *JiraImporter) MigrateIssues() {
 		if issue.EpicLink != "" {
 			if issueType == "Subtask" {
 				// For subtasks, add the issue as the child of the new Story(epic)
-				updateData.Fields.Parent.Key = issue.EpicLink
+				fd.Parent.Key = issue.EpicLink
 			} else {
 				// Only subtasks can be children. Create a 'Blocks' relationship
 				issueLink := jira.IssueLink{
@@ -77,12 +79,12 @@ func (ji *JiraImporter) MigrateIssues() {
 			fmt.Printf("Error getting type for issue %s: %s\n", issue.IssueKey, err)
 			continue
 		}
-		updateData.Fields.IssueType.ID = typeID
+		fd.IssueType.ID = typeID
 
 		// Add existing subtasks back to their parent issues
 		if issue.ParentID != "" {
 			if parentKey := findParentIssueKey(issue.ParentID, issues); parentKey != "" {
-				updateData.Fields.Parent.Key = parentKey
+				fd.Parent.Key = parentKey
 			}
 		}
 
@@ -90,7 +92,7 @@ func (ji *JiraImporter) MigrateIssues() {
 		if issue.StoryPoints != "" {
 			points, err := strconv.Atoi(issue.StoryPoints)
 			if err == nil {
-				updateData.Update.StoryPoints = append(updateData.Update.StoryPoints, struct {
+				ud.StoryPoints = append(ud.StoryPoints, struct {
 					Set int `json:"set,omitempty"`
 				}{
 					Set: points,
@@ -118,12 +120,11 @@ func (ji *JiraImporter) MigrateIssues() {
 		}
 
 		// Update the issue on Jira
-		if err = ji.updateIssue(issue.IssueKey, &updateData); err != nil {
+		iud := issueUpdateData{Update: ud, Fields: fd}
+		if err = ji.updateIssue(issue.IssueKey, &iud); err != nil {
 			fmt.Printf("Error updating issue %s: %s\n", issue.IssueKey, err)
 		}
 	}
-
-	// TODO: Components become labels
 }
 
 // MigrateVersions migrates project FixVersions between Jira accounts
@@ -200,13 +201,16 @@ func (ji *JiraImporter) MigrateComponents() {
 
 		// Add label to issues on new account
 		for _, i := range issues {
-			var updateData = issueUpdateData{}
-			updateData.Update.Labels = append(updateData.Update.Labels, struct {
+			ud := &updateData{}
+			// Labels can't have spaces
+			label := strings.ReplaceAll(c.Name, " ", "_")
+			ud.Labels = append(ud.Labels, struct {
 				Add string `json:"add,omitempty"`
 			}{
-				Add: c.Name,
+				Add: label,
 			})
-			if err = ji.updateIssue(i.Key, &updateData); err != nil {
+			iud := issueUpdateData{Update: ud}
+			if err = ji.updateIssue(i.Key, &iud); err != nil {
 				fmt.Printf("Error updating issue %s: %s\n", i.Key, err)
 			}
 		}
