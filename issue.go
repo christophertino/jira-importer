@@ -51,7 +51,7 @@ func (ji *JiraImporter) updateIssue(issueKey string, data *issueUpdateData) erro
 		return err
 	}
 
-	fmt.Println(string(bytesMessage))
+	// fmt.Println(string(bytesMessage))
 
 	_, err = ji.sendJiraRequest(http.MethodPut, fmt.Sprintf("/issue/%s?notifyUsers=false", issueKey), bytes.NewBuffer(bytesMessage))
 	if err != nil {
