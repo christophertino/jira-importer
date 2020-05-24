@@ -8,6 +8,7 @@ A set of helper tools for importing issues from a classic Jira project into a ne
 + Sub-tasks lose their parent relationships
 + Split issue relationships are lost
 + Component info is lost
++ Version status and resolution dates are lost
 
 This project will:
 
@@ -17,6 +18,7 @@ This project will:
 	+ Currently there is not way to convert a Task to Epic
 + Add sub-tasks to their correct parent tasks
 + Add components as ticket labels (Next-gen does not support components)
++ Migrate versions status and resolution dates
 
 ## Configuration
 
@@ -34,6 +36,7 @@ $ cp .env-example .env
 
 #### In the Classic Project:
 1. Issues & Filters > All Issues > Advanced Search > Export > Export Excel CSV (all fields)
+	+ If project has more than 1000 issues, follow instructions [here](https://confluence.atlassian.com/jirakb/export-over-1000-results-to-excel-from-jira-cloud-779160833.html) to paginate 
 2. Edit the Permission Scheme for the project (if migrating between Jira Cloud Instances)
 	+ Set 'Browse Projects' permission group to 'Public'
 	+ This allows the importer to migrate attachments
