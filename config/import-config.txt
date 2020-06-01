@@ -1,0 +1,165 @@
+{
+  "config.version" : "2.0",
+  "config.project.from.csv" : "false",
+  "config.encoding" : "UTF-8",
+  "config.file.id" : null,
+  "config.email.suffix" : "@your-domain.com",
+  "config.file.name" : "JIRA.csv",
+  "config.field.mappings" : {
+    "Description" : {
+      "jira.field" : "description",
+      "userChanged" : "false",
+      "manualMapping" : "false"
+    },
+    "Parent" : {
+      "userChanged" : "false",
+      "manualMapping" : "false",
+      "existing.custom.field" : "10018"
+    },
+    "Attachment" : {
+      "jira.field" : "attachment",
+      "userChanged" : "false",
+      "manualMapping" : "false"
+    },
+    "Affects versions" : {
+      "jira.field" : "versions",
+      "userChanged" : "false",
+      "manualMapping" : "false"
+    },
+    "Custom field (Epic Link)" : {
+      "userChanged" : "false",
+      "manualMapping" : "false",
+      "existing.custom.field" : "10014"
+    },
+    "Created" : {
+      "jira.field" : "created",
+      "userChanged" : "false",
+      "manualMapping" : "false"
+    },
+    "Outward issue link (Relates)" : {
+      "link.type" : "10003",
+      "userChanged" : "false",
+      "manualMapping" : "false"
+    },
+    "Resolved" : {
+      "jira.field" : "resolutiondate",
+      "userChanged" : "false",
+      "manualMapping" : "false"
+    },
+    "Issue id" : {
+      "jira.field" : "issue-id",
+      "userChanged" : "false",
+      "manualMapping" : "false"
+    },
+    "Status" : {
+      "jira.field" : "status",
+      "userChanged" : "false",
+      "manualMapping" : "true"
+    },
+    "Assignee" : {
+      "jira.field" : "assignee",
+      "userChanged" : "false",
+      "manualMapping" : "false"
+    },
+    "Comment" : {
+      "jira.field" : "comment",
+      "userChanged" : "false",
+      "manualMapping" : "false"
+    },
+    "Issue key" : {
+      "jira.field" : "issuekey",
+      "userChanged" : "false",
+      "manualMapping" : "false"
+    },
+    "Priority" : {
+      "jira.field" : "priority",
+      "userChanged" : "false",
+      "manualMapping" : "false"
+    },
+    "Parent id" : {
+      "jira.field" : "subtask-parent-id",
+      "userChanged" : "false",
+      "manualMapping" : "false"
+    },
+    "Reporter" : {
+      "jira.field" : "reporter",
+      "userChanged" : "false",
+      "manualMapping" : "false"
+    },
+    "Labels" : {
+      "jira.field" : "labels",
+      "userChanged" : "false",
+      "manualMapping" : "false"
+    },
+    "Custom field (Story point estimate)" : {
+      "userChanged" : "false",
+      "manualMapping" : "false",
+      "existing.custom.field" : "10016"
+    },
+    "Fix versions" : {
+      "jira.field" : "fixVersions",
+      "userChanged" : "false",
+      "manualMapping" : "false"
+    },
+    "Outward issue link (Duplicate)" : {
+      "link.type" : "10002",
+      "userChanged" : "false",
+      "manualMapping" : "false"
+    },
+    "Issue Type" : {
+      "jira.field" : "issuetype",
+      "userChanged" : "true",
+      "manualMapping" : "true"
+    },
+    "Custom field (Epic Name)" : {
+      "userChanged" : "false",
+      "manualMapping" : "false",
+      "existing.custom.field" : "10011"
+    },
+    "Outward issue link (Blocks)" : {
+      "link.type" : "10000",
+      "userChanged" : "false",
+      "manualMapping" : "false"
+    },
+    "Custom field (Epic Status)" : {
+      "userChanged" : "false",
+      "manualMapping" : "false",
+      "existing.custom.field" : "10012"
+    },
+    "Summary" : {
+      "jira.field" : "summary",
+      "userChanged" : "false",
+      "manualMapping" : "false"
+    },
+    "Custom field (Story Points)" : {
+      "userChanged" : "false",
+      "manualMapping" : "false",
+      "existing.custom.field" : "10024"
+    },
+    "Resolution" : {
+      "jira.field" : "resolution",
+      "userChanged" : "false",
+      "manualMapping" : "false"
+    }
+  },
+  "config.csv.file.id" : null,
+  "config.value.mappings" : {
+    "Status" : {
+      "Done" : "10024",
+      "Open" : "10022"
+    },
+    "Issue Type" : {
+      "Bug" : "10035"
+    }
+  },
+  "config.delimiter" : ",",
+  "config.project" : {
+    "project.type" : null,
+    "project.key" : null,
+    "project.description" : null,
+    "project.url" : null,
+    "project.name" : null,
+    "project.lead" : null
+  },
+  "config.date.format" : "dd/MMM/yy h:mm a"
+}
